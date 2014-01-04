@@ -2,6 +2,7 @@ from module.plugins.Hook import Hook
 import os
 import shutil
 import xml.etree.ElementTree as ET
+import re
 
 	
 class PyloadMover(Hook):
@@ -92,7 +93,68 @@ class PyloadMover(Hook):
 						else:
 							self.logInfo("found series")
 
+							try:
+								#search for mapping
+								tree = ET.parse(self.seriesMappingFile)
+								root = tree.getroot()
 
+								foundMapping = False
+								for series in root.iter("series"):
+									for mapping in series.iter("mapping"):
+										if mapping.text in filename:
+											self.logInfo("mapping found %s for %s" % (mapping.text,series.get("name")))
+											foundMapping = True
+											# move element to series
+
+											seriesFolder=os.path.join(self.seriesPath,series.get("path"))
+
+											seriesNum = None
+											episodeNum = None
+
+											if re.match('.*S\.?(\d+)E\.?(\d+).*', filename):
+												m = re.search('.*S\.?(\d+)E\.?(\d+).*', filename)
+												# found best match
+												seriesNum = m.group(1)
+												episodeNum = m.group(2)
+											elif re.match('.*(\d+)(\d\d).*', filename):
+												# not so a good match
+												m = re.search('.*(\d+)(\d\d).*', filename)
+												
+												seriesNum = m.group(1)
+												episodeNum = m.group(2)
+											elif re.match('.*(\d\d).*', filename):
+												# last guess
+												m = re.search('.*(\d\d).*', filename)
+												seriesNum = "01"
+												episodeNum = m.group(1)
+											elif re.match('.*(\d+).*', filename):
+												# find any number in filename
+												m = re.search('.*(\d\d).*', filename)
+												seriesNum = "01"
+												episodeNum = m.group(1)
+											else:
+												# no episodeNum found
+												seriesNum = "01"
+												episodeNum = "01"
+
+
+											self.logInfo("Series: %s Episode: %s" %(seriesNum,episodeNum))
+
+											
+
+											break
+
+									# break outer loop
+									if foundMapping:
+										break
+
+
+							except Exception, e:
+								self.logError("failed to move file into series folder: %s" % (e) )
+							else:
+								pass
+							finally:
+								pass
 
 
 
