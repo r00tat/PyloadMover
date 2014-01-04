@@ -99,8 +99,8 @@ class PyloadMover(Hook):
 								root = tree.getroot()
 
 								foundMapping = False
-								for series in root.iter("series"):
-									for mapping in series.iter("mapping"):
+								for series in root.getiterator("series"):
+									for mapping in series.getiterator("mapping"):
 										if mapping.text in filename:
 											self.logInfo("mapping found %s for %s" % (mapping.text,series.get("name")))
 											foundMapping = True
