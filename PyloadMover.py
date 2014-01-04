@@ -83,6 +83,8 @@ class PyloadMover(Hook):
 						break
 					fileEnding = filename[lastDot+1 :]
 
+					filenameLower=filename.lower()
+
 					if fileEnding in self.videoFileEndings:
 						fullname=os.path.join(dirpath,filename)
 						self.logInfo("found video %s %d" % (fullname,os.path.getsize(fullname)))
@@ -113,7 +115,7 @@ class PyloadMover(Hook):
 								foundMapping = False
 								for series in root.getiterator("series"):
 									for mapping in series.getiterator("mapping"):
-										if mapping.text in filename:
+										if mapping.text.lower() in filenameLower:
 											self.logInfo("mapping found %s for %s" % (mapping.text,series.get("name")))
 											foundMapping = True
 											# move element to series
