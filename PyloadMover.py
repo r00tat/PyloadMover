@@ -31,18 +31,18 @@ class PyloadMover(Hook):
 		self.movieSize=self.getConfig("movieSize")
 		self.moviesPath=self.getConfig("moviesPath")
 		self.seriesPath=self.getConfig("seriesPath")
-		print "config loaded"
+		self.logInfo( "config loaded")
 
 	def initialize(self):
 		self.loadConfig()
-		print "Initialized."
+		self.logInfo( "Initialized.")
 
 	def downloadFinished(self, pyfile):
-		print "download complete: %s".format(pyfile)
+		self.logInfo( "download complete: %s".format(pyfile))
 
 	def unrarFinished(self,folder, fname):
-		print "finished unrar of %s in %s".format(fname,folder)
+		self.logInfo( "finished unrar of %s in %s".format(fname,folder))
 
 	def pluginConfigChanged(self):
-		print "Plugin config changed!"
+		self.logInfo( "Plugin config changed!")
 		self.loadConfig()
