@@ -81,7 +81,7 @@ class PyloadMover(Hook):
 					if lastDot == -1 or lastDot+1  == len(filename):
 						# no file ending or dot at the end
 						break
-					fileEnding = filename[lastDot+1 :]
+					fileEnding = filename[lastDot+1 :].lower()
 
 					filenameLower=filename.lower()
 
