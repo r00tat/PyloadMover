@@ -1,6 +1,7 @@
 from module.plugins.Hook import Hook
 import os
 import shutil
+import xml.etree.ElementTree as ET
 
 	
 class PyloadMover(Hook):
@@ -13,7 +14,8 @@ class PyloadMover(Hook):
 	__config__ = [ ("activated" , "bool" , "Activated"  , "False" ),
 		("movieSize" , "int" , "Treat files larger than this MB as movie"  , "2000" ),
 		("moviesPath" , "str" , "Folder for movies"  , "/share/Multimedia/Movies" ),
-		("seriesPath" , "str" , "Folder for series"  , "/share/Multimedia/Series" ), ]
+		("seriesPath" , "str" , "Folder for series"  , "/share/Multimedia/Series" ), 
+		("seriesMappingFile" , "str" , "XML File for mapping file names to series"  , "mover.xml" ), ]
 	#__threaded__ = ["downloadFinished"]
 	__author_name__ = ("Paul Woelfel")
 	__author_mail__ = ("pyload@frig.at")
@@ -28,12 +30,15 @@ class PyloadMover(Hook):
 	movieSize = 2000
 	moviesPath = None
 	seriesPath = None
+	seriesMappingFile = None
 
 	def loadConfig(self):
 		self.activated=self.getConfig("activated")
 		self.movieSize=self.getConfig("movieSize")
 		self.moviesPath=self.getConfig("moviesPath")
 		self.seriesPath=self.getConfig("seriesPath")
+		self.seriesMappingFile=self.getConfig("seriesMappingFile")
+		self.initSeriesMapping()
 
 	def initialize(self):
 		self.loadConfig()
@@ -77,10 +82,53 @@ class PyloadMover(Hook):
 
 
 
+
 						break
 
 			if found:
 				break
+
+
+	"""
+	check if XML exists
+	if not, create dummy mappings
+	"""
+	def initSeriesMapping(self):
+		if not os.path.isfile(self.seriesMappingFile):
+			# create root element
+			root = ET.Element("mappings")
+
+			# add a series
+			series = ET.SubElement(root, "series")
+			series.set("name","Some series title")
+			series.set("folder","My.Series.Folder")
+
+			# create mappings
+			mapping = ET.SubElement(series, "mapping")
+			mapping.text="someseries"
+
+			mapping = ET.SubElement(series, "mapping")
+			mapping.text="some.series"
+
+			mapping = ET.SubElement(series, "mapping")
+			mapping.text="my.series"
+
+			tree = ET.ElementTree(root)
+			tree.write(self.seriesMappingFile)
+			
+		else:
+			try:
+				tree = ET.parse(self.seriesMappingFile)
+				root = tree.getroot()
+				pass
+			except Exception, e:
+				# file is wrong
+				self.logError("could not load mapping file %s: %s" % (self.seriesMappingFile, e)
+			else:
+				pass
+			finally:
+				pass
+			
 
 		
 
@@ -94,4 +142,8 @@ class PyloadMover(Hook):
 			self.moviesPath=value
 		elif param == "seriesPath":
 			self.seriesPath = value
+		elif param == "seriesMappingFile":
+			self.seriesMappingFile=value
+			self.initSeriesMapping()
+
 		#self.loadConfig()
