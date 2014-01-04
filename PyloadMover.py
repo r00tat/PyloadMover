@@ -108,39 +108,54 @@ class PyloadMover(Hook):
 
 											seriesFolder=os.path.join(self.seriesPath,series.get("path"))
 
-											seriesNum = None
+											seasonNum = None
 											episodeNum = None
 
 											if re.match('.*S\.?(\d+)E\.?(\d+).*', filename):
 												m = re.search('.*S\.?(\d+)E\.?(\d+).*', filename)
 												# found best match
-												seriesNum = m.group(1)
+												seasonNum = m.group(1)
 												episodeNum = m.group(2)
 											elif re.match('.*(\d+)(\d\d).*', filename):
 												# not so a good match
 												m = re.search('.*(\d+)(\d\d).*', filename)
 												
-												seriesNum = m.group(1)
+												seasonNum = m.group(1)
 												episodeNum = m.group(2)
 											elif re.match('.*(\d\d).*', filename):
 												# last guess
 												m = re.search('.*(\d\d).*', filename)
-												seriesNum = "01"
+												seasonNum = "01"
 												episodeNum = m.group(1)
 											elif re.match('.*(\d+).*', filename):
 												# find any number in filename
-												m = re.search('.*(\d\d).*', filename)
-												seriesNum = "01"
+												m = re.search('.*(\d+).*', filename)
+												seasonNum = "01"
 												episodeNum = m.group(1)
 											else:
 												# no episodeNum found
-												seriesNum = "01"
+												seasonNum = "01"
 												episodeNum = "01"
 
 
-											self.logInfo("Series: %s Episode: %s" %(seriesNum,episodeNum))
+											self.logInfo("Season: %s Episode: %s" %(seasonNum,episodeNum))
 
+											seasonFolder = os.path.join(seriesFolder,"S.%s" % (seasonNum))
+
+											if not os.path.isdir(seasonFolder):
+												if os.path.isdir(os.path.join(seriesFolder,"S%s" % (seasonNum))):
+													seasonFolder = os.path.join(seriesFolder,"S%s" % (seasonNum))
+												else:
+													# create folder
+													os.makedirs(seasonFolder)
+
+											self.logInfo("Season folde: %s" % (seasonFolder))
 											
+											shutil.move(fullname,seasonFolder)
+
+											self.logInfo("removing folder")
+											shutil.rmtree(folder)
+
 
 											break
 
