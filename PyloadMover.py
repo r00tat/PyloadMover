@@ -17,7 +17,8 @@ class PyloadMover(Hook):
 		("movieSize" , "int" , "Treat files larger than this MB as movie"  , "2000" ),
 		("moviesPath" , "str" , "Folder for movies"  , "/share/Multimedia/Movies" ),
 		("seriesPath" , "str" , "Folder for series"  , "/share/Multimedia/Series" ), 
-		("seriesMappingFile" , "str" , "XML File for mapping file names to series"  , "mover.xml" ), ]
+		("seriesMappingFile" , "str" , "XML File for mapping file names to series"  , "mover.xml" ),
+		("deleteFolder" , "bool" , "Delete dowload folder after renaming"  , "True" ), ]
 	#__threaded__ = ["downloadFinished"]
 	__author_name__ = ("Paul Woelfel")
 	__author_mail__ = ("pyload@frig.at")
@@ -33,6 +34,7 @@ class PyloadMover(Hook):
 	moviesPath = None
 	seriesPath = None
 	seriesMappingFile = None
+	deleteFolder = True
 
 	videoFileEndings = ["mkv","avi"]
 
@@ -45,6 +47,7 @@ class PyloadMover(Hook):
 		self.moviesPath=self.getConfig("moviesPath")
 		self.seriesPath=self.getConfig("seriesPath")
 		self.seriesMappingFile=self.getConfig("seriesMappingFile")
+		self.deleteFolder=self.getConfig("deleteFolder")
 		self.initSeriesMapping()
 
 	"""
@@ -99,8 +102,9 @@ class PyloadMover(Hook):
 
 							shutil.move(fullname,folderName)
 
-							self.logInfo("removing folder %s " % (folder))
-							shutil.rmtree(folder)
+							if self.deleteFolder:
+								self.logInfo("removing folder %s " % (folder))
+								shutil.rmtree(folder)
 
 
 						else:
@@ -197,8 +201,9 @@ class PyloadMover(Hook):
 											self.logInfo("moving %s to %s"%(fullname,finalPath))
 											shutil.move(fullname,finalPath)
 
-											self.logInfo("removing folder %s" % (folder))
-											shutil.rmtree(folder)
+											if self.deleteFolder:
+												self.logInfo("removing folder %s" % (folder))
+												shutil.rmtree(folder)
 
 
 											break
@@ -282,5 +287,7 @@ class PyloadMover(Hook):
 		elif param == "seriesMappingFile":
 			self.seriesMappingFile=value
 			self.initSeriesMapping()
+		elif param == "deleteFolder":
+			self.deleteFolder=value
 
 		#self.loadConfig()
