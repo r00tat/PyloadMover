@@ -48,28 +48,28 @@ In the above example we use "`some.series.S%sE%e.%f`". So the 12 episode of the 
 
 Settings
 -------------
-### Activated (bool)
+#### Activated (bool)
 Defines if the plugin is active or not.
 Default: False
 
-### movieSize (int)
+#### movieSize (int)
 Defines the size a file in MB must have to be treated as a movie.
 If set to -1 every file will be handled as a series first and if no mapping is found be treated as a movie.
 Default: -1
 
-### moviesPath (str)
+#### moviesPath (str)
 Defines the base folder where all movies will be put.
 Default: /share/Multimedia/Movies
 
-### seriesPath (str)
+#### seriesPath (str)
 Defines the base folder where all series will be put.
 Default: /share/Multimedia/Series
 
-### seriesMappingFile (str)
+#### seriesMappingFile (str)
 Defines the file name for the mapping XML file. The default folder for this file is the pyload data folder. Also an absolute path could be used.
 Default: mover.xml
 
-### deleteFolder (bool)
+#### deleteFolder (bool)
 Defines if the download folder will be deleted after processing. The folder will only be deleted if the file could be moved.
 Default: True
 
