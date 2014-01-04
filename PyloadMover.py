@@ -160,6 +160,11 @@ class PyloadMover(Hook):
 												episodeNum = "01"
 
 
+											if mapping.get("season"):
+												# overide season mapping
+												seasonNum=mapping.get("season")
+
+
 											self.logInfo("Season: %s Episode: %s" %(seasonNum,episodeNum))
 
 											seasonFolder = os.path.join(seriesFolder,"S.%s" % (seasonNum))
