@@ -44,7 +44,7 @@ This series element contains one mandatory attribute `name` and some other optio
 
 The `folder` attribute is optional and could be used to explicitly specify the folder name. If no folder attribute given, the folder will be the name, with spaces "` `" replaced by "`.`"
 
-If a `renamePattern` is given, the file will be renamed after moving it to the correct folder. See [Renameing](#renaming) for more details.
+If a `renamePattern` is given, the file will be renamed after moving it to the correct folder. See [Renameing](#renameing) for more details.
 
 Each series can contain multiple mappings. Each `mapping` XML elements text will be searched in the filename. If the filename contains this text, it will be considered a match and will be moved to the series folder. The search is case insensitive.
 
@@ -113,7 +113,7 @@ The season could also be overwritten by [mappings](#mappings).
 
 Settings
 -------------
-[settings]: 
+
 #### Activated (bool)
 Defines if the plugin is active or not.  
 Default: `False`
@@ -132,7 +132,7 @@ Defines the base folder where all series will be put.
 Default: `/share/Multimedia/Series`
 
 #### seriesMappingFile (str)
-Defines the file name for the mapping XML file. The default folder for this file is the pyload data folder. Also an absolute path could be used.  
+Defines the file name for the mapping XML file. The default folder for this file is the pyload data folder. Also an absolute path could be used. See also [the example mover.xml file](#moverxml).  
 Default: `mover.xml`
 
 #### deleteFolder (bool)
