@@ -114,7 +114,7 @@ class PyloadMover(Hook):
 			mapping.text="my.series"
 
 			tree = ET.ElementTree(root)
-			tree.write(self.seriesMappingFile)
+			tree.write(self.seriesMappingFile,"utf-8")
 			
 		else:
 			try:
@@ -123,7 +123,7 @@ class PyloadMover(Hook):
 				pass
 			except Exception, e:
 				# file is wrong
-				self.logError("could not load mapping file %s: %s" % (self.seriesMappingFile, e)
+				self.logError("could not load mapping file %s: %s" % (self.seriesMappingFile, e))
 			else:
 				pass
 			finally:
