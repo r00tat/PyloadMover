@@ -1,4 +1,7 @@
 from module.plugins.Hook import Hook
+import os
+from os.path import join, getsize
+
 	
 class PyloadMover(Hook):
 	"""
@@ -41,6 +44,27 @@ class PyloadMover(Hook):
 
 	def unrarFinished(self,folder, fname):
 		self.logInfo( "finished unrar of %s in %s" % (fname,folder))
+
+		# we have to search folder for sub folders or files
+
+		found = False
+		# loop through directories in folder
+		for (dirpath, dirnames, filenames) in os.walk(folder):
+			# ignore samples
+			if not (dirpath == "sample" or dirpath == "Sample"):
+				# search for videos in filenames
+				for filename in filenames:
+					if filename.endswith(".mkv") or filename.endswith(".avi"):
+						fullname=os.path.join(dirpath,filename)
+						self.logInfo("found video %s %d" % (fullname,os.path.getsize(fullname)))
+						found = True
+
+						break
+
+			if found:
+				break
+
+		
 
 	def pluginConfigChanged(self,moduleName,param,value):
 		self.logInfo( "Plugin config changed: %s=%s" % (param,value))
