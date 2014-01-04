@@ -319,19 +319,20 @@ class PyloadMover(Hook):
 	hook for plugin Config changed
 	"""
 	def pluginConfigChanged(self,moduleName,param,value):
-		self.logInfo( "Plugin config changed: %s=%s" % (param,value))
-		if param == "activated":
-			self.activated=value
-		elif param == "movieSize":
-			self.movieSize=value
-		elif param == "moviePath":
-			self.moviesPath=value
-		elif param == "seriesPath":
-			self.seriesPath = value
-		elif param == "seriesMappingFile":
-			self.seriesMappingFile=value
-			self.initSeriesMapping()
-		elif param == "deleteFolder":
-			self.deleteFolder=value
+		if moduleName == "PyloadMover":
+			self.logInfo( "Plugin config changed: %s=%s" % (param,value))
+			if param == "activated":
+				self.activated=value
+			elif param == "movieSize":
+				self.movieSize=value
+			elif param == "moviePath":
+				self.moviesPath=value
+			elif param == "seriesPath":
+				self.seriesPath = value
+			elif param == "seriesMappingFile":
+				self.seriesMappingFile=value
+				self.initSeriesMapping()
+			elif param == "deleteFolder":
+				self.deleteFolder=value
 
 		#self.loadConfig()
