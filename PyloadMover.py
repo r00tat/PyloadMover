@@ -133,8 +133,8 @@ class PyloadMover(Hook):
 											seasonNum = None
 											episodeNum = None
 
-											if re.match('.*S\.?(\d+)E\.?(\d+).*', filename):
-												m = re.search('.*S\.?(\d+)E\.?(\d+).*', filename)
+											if re.match('.*S\.?(\d+)E\.?(\d+).*', filename,flags=re.IGNORECASE):
+												m = re.search('.*S\.?(\d+)E\.?(\d+).*', filename,flags=re.IGNORECASE)
 												# found best match
 												seasonNum = m.group(1)
 												episodeNum = m.group(2)
