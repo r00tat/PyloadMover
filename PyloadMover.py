@@ -3,6 +3,7 @@ import os
 import shutil
 import xml.etree.ElementTree as ET
 import re
+import traceback
 
 	
 class PyloadMover(Hook):
@@ -106,7 +107,17 @@ class PyloadMover(Hook):
 											foundMapping = True
 											# move element to series
 
-											seriesFolder=os.path.join(self.seriesPath,series.get("path"))
+											seriesFolderName = series.get("folder")
+											if seriesFolderName == None:
+												seriesFolderName = series.get("name")
+												if seriesFolderName == None: 
+													#again?
+													self.logWarn("did not find a folder or name in series element")
+													break
+												seriesFolderName=seriesFolderName.replace(' ',".")
+
+
+											seriesFolder=os.path.join(self.seriesPath,seriesFolderName)
 
 											seasonNum = None
 											episodeNum = None
@@ -149,7 +160,7 @@ class PyloadMover(Hook):
 													# create folder
 													os.makedirs(seasonFolder)
 
-											self.logInfo("Season folde: %s" % (seasonFolder))
+											self.logInfo("Season folder: %s" % (seasonFolder))
 											
 											shutil.move(fullname,seasonFolder)
 
@@ -166,6 +177,7 @@ class PyloadMover(Hook):
 
 							except Exception, e:
 								self.logError("failed to move file into series folder: %s" % (e) )
+								self.logError("Traceback %s" % traceback.format_exc(e))
 							else:
 								pass
 							finally:
