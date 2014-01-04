@@ -11,7 +11,7 @@ class PyloadMover(Hook):
 	Moves files to movie or series folder.
 	"""
 	__name__ = "PyloadMover"
-	__version__ = "0.1"
+	__version__ = "0.1.1"
 	__description__ = "Moves finished downloads to movies or series folders."
 	__config__ = [ ("activated" , "bool" , "Activated"  , "False" ),
 		("movieSize" , "int" , "Treat files larger than this MB as movie"  , "-1" ),
