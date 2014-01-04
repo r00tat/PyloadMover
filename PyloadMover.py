@@ -70,163 +70,164 @@ class PyloadMover(Hook):
 	def unrarFinished(self,folder, fname):
 		self.logInfo( "finished unrar of %s in %s" % (fname,folder))
 
-		# we have to search folder for sub folders or files
+		if self.activated:
+			# we have to search folder for sub folders or files
 
-		found = False
-		# loop through directories in folder
-		for (dirpath, dirnames, filenames) in os.walk(folder):
-			# ignore samples
-			if not (dirpath == "sample" or dirpath == "Sample"):
-				# search for videos in filenames
-				for filename in filenames:
-					lastDot = filename.rfind(".")
+			found = False
+			# loop through directories in folder
+			for (dirpath, dirnames, filenames) in os.walk(folder):
+				# ignore samples
+				if not (dirpath == "sample" or dirpath == "Sample"):
+					# search for videos in filenames
+					for filename in filenames:
+						lastDot = filename.rfind(".")
 
-					if lastDot == -1 or lastDot+1  == len(filename):
-						# no file ending or dot at the end
-						break
-					fileEnding = filename[lastDot+1 :].lower()
+						if lastDot == -1 or lastDot+1  == len(filename):
+							# no file ending or dot at the end
+							break
+						fileEnding = filename[lastDot+1 :].lower()
 
-					filenameLower=filename.lower()
+						filenameLower=filename.lower()
 
-					if fileEnding in self.videoFileEndings:
-						fullname=os.path.join(dirpath,filename)
-						self.logInfo("found video %s %d" % (fullname,os.path.getsize(fullname)))
-						found = True
+						if fileEnding in self.videoFileEndings:
+							fullname=os.path.join(dirpath,filename)
+							self.logInfo("found video %s %d" % (fullname,os.path.getsize(fullname)))
+							found = True
 
-						if os.path.getsize(fullname) / (1024 * 1024) >= self.movieSize:
-							# Movie
-							self.logInfo("found movie")
-							folderName=os.path.join(self.moviesPath,filename.replace(".%s"%(fileEnding),""))
-							self.logInfo("moving to %s " % (folderName))
-							os.makedirs(folderName)
+							if os.path.getsize(fullname) / (1024 * 1024) >= self.movieSize:
+								# Movie
+								self.logInfo("found movie")
+								folderName=os.path.join(self.moviesPath,filename.replace(".%s"%(fileEnding),""))
+								self.logInfo("moving to %s " % (folderName))
+								os.makedirs(folderName)
 
-							shutil.move(fullname,folderName)
+								shutil.move(fullname,folderName)
 
-							if self.deleteFolder:
-								self.logInfo("removing folder %s " % (folder))
-								shutil.rmtree(folder)
-
-
-						else:
-							# Series
-							self.logInfo("found series")
-
-							try:
-								#search for mapping
-								tree = ET.parse(self.seriesMappingFile)
-								root = tree.getroot()
-
-								foundMapping = False
-								for series in root.getiterator("series"):
-									for mapping in series.getiterator("mapping"):
-										if mapping.text.lower() in filenameLower:
-											self.logInfo("mapping found %s for %s" % (mapping.text,series.get("name")))
-											foundMapping = True
-											# move element to series
-
-											seriesFolderName = series.get("folder")
-											if seriesFolderName == None:
-												seriesFolderName = series.get("name")
-												if seriesFolderName == None: 
-													#again?
-													self.logWarn("did not find a folder or name in series element")
-													break
-												seriesFolderName=seriesFolderName.replace(' ',".")
+								if self.deleteFolder:
+									self.logInfo("removing folder %s " % (folder))
+									shutil.rmtree(folder)
 
 
-											seriesFolder=os.path.join(self.seriesPath,seriesFolderName)
+							else:
+								# Series
+								self.logInfo("found series")
 
-											seasonNum = None
-											episodeNum = None
+								try:
+									#search for mapping
+									tree = ET.parse(self.seriesMappingFile)
+									root = tree.getroot()
 
-											if re.match('.*S\.?(\d+)E\.?(\d+).*', filename,flags=re.IGNORECASE):
-												m = re.search('.*S\.?(\d+)E\.?(\d+).*', filename,flags=re.IGNORECASE)
-												# found best match
-												seasonNum = m.group(1)
-												episodeNum = m.group(2)
-											elif re.match('.*(\d+)(\d\d).*', filename):
-												# not so a good match
-												m = re.search('.*(\d+)(\d\d).*', filename)
-												
-												seasonNum = m.group(1)
-												episodeNum = m.group(2)
-											elif re.match('.*(\d\d).*', filename):
-												# last guess
-												m = re.search('.*(\d\d).*', filename)
-												seasonNum = "01"
-												episodeNum = m.group(1)
-											elif re.match('.*(\d+).*', filename):
-												# find any number in filename
-												m = re.search('.*(\d+).*', filename)
-												seasonNum = "01"
-												episodeNum = m.group(1)
-											else:
-												# no episodeNum found
-												seasonNum = "01"
-												episodeNum = "01"
+									foundMapping = False
+									for series in root.getiterator("series"):
+										for mapping in series.getiterator("mapping"):
+											if mapping.text.lower() in filenameLower:
+												self.logInfo("mapping found %s for %s" % (mapping.text,series.get("name")))
+												foundMapping = True
+												# move element to series
+
+												seriesFolderName = series.get("folder")
+												if seriesFolderName == None:
+													seriesFolderName = series.get("name")
+													if seriesFolderName == None: 
+														#again?
+														self.logWarn("did not find a folder or name in series element")
+														break
+													seriesFolderName=seriesFolderName.replace(' ',".")
 
 
-											if mapping.get("season"):
-												# overide season mapping
-												seasonNum=mapping.get("season")
+												seriesFolder=os.path.join(self.seriesPath,seriesFolderName)
 
-											if len(seasonNum) == 1:
-												seasonNum = "0%s"%(seasonNum)
+												seasonNum = None
+												episodeNum = None
 
-
-											if len(episodeNum) == 1:
-												episodeNum = "0%s"%(episodeNum)
-
-
-											self.logInfo("Season: %s Episode: %s" %(seasonNum,episodeNum))
-
-											seasonFolder = os.path.join(seriesFolder,"S.%s" % (seasonNum))
-
-											if not os.path.isdir(seasonFolder):
-												if os.path.isdir(os.path.join(seriesFolder,"S%s" % (seasonNum))):
-													seasonFolder = os.path.join(seriesFolder,"S%s" % (seasonNum))
+												if re.match('.*S\.?(\d+)E\.?(\d+).*', filename,flags=re.IGNORECASE):
+													m = re.search('.*S\.?(\d+)E\.?(\d+).*', filename,flags=re.IGNORECASE)
+													# found best match
+													seasonNum = m.group(1)
+													episodeNum = m.group(2)
+												elif re.match('.*(\d+)(\d\d).*', filename):
+													# not so a good match
+													m = re.search('.*(\d+)(\d\d).*', filename)
+													
+													seasonNum = m.group(1)
+													episodeNum = m.group(2)
+												elif re.match('.*(\d\d).*', filename):
+													# last guess
+													m = re.search('.*(\d\d).*', filename)
+													seasonNum = "01"
+													episodeNum = m.group(1)
+												elif re.match('.*(\d+).*', filename):
+													# find any number in filename
+													m = re.search('.*(\d+).*', filename)
+													seasonNum = "01"
+													episodeNum = m.group(1)
 												else:
-													# create folder
-													os.makedirs(seasonFolder)
-
-											self.logInfo("Season folder: %s" % (seasonFolder))
-
-											destFilename = filename
-
-											# optional: rename files
-											if series.get("renamePattern") != None:
-												destFilename=series.get("renamePattern").replace("%s",seasonNum).replace("%e",episodeNum).replace("%f",fileEnding)
-											
-											finalPath=os.path.join(seasonFolder,destFilename)
-											self.logInfo("moving %s to %s"%(fullname,finalPath))
-											shutil.move(fullname,finalPath)
-
-											if self.deleteFolder:
-												self.logInfo("removing folder %s" % (folder))
-												shutil.rmtree(folder)
+													# no episodeNum found
+													seasonNum = "01"
+													episodeNum = "01"
 
 
+												if mapping.get("season"):
+													# overide season mapping
+													seasonNum=mapping.get("season")
+
+												if len(seasonNum) == 1:
+													seasonNum = "0%s"%(seasonNum)
+
+
+												if len(episodeNum) == 1:
+													episodeNum = "0%s"%(episodeNum)
+
+
+												self.logInfo("Season: %s Episode: %s" %(seasonNum,episodeNum))
+
+												seasonFolder = os.path.join(seriesFolder,"S.%s" % (seasonNum))
+
+												if not os.path.isdir(seasonFolder):
+													if os.path.isdir(os.path.join(seriesFolder,"S%s" % (seasonNum))):
+														seasonFolder = os.path.join(seriesFolder,"S%s" % (seasonNum))
+													else:
+														# create folder
+														os.makedirs(seasonFolder)
+
+												self.logInfo("Season folder: %s" % (seasonFolder))
+
+												destFilename = filename
+
+												# optional: rename files
+												if series.get("renamePattern") != None:
+													destFilename=series.get("renamePattern").replace("%s",seasonNum).replace("%e",episodeNum).replace("%f",fileEnding)
+												
+												finalPath=os.path.join(seasonFolder,destFilename)
+												self.logInfo("moving %s to %s"%(fullname,finalPath))
+												shutil.move(fullname,finalPath)
+
+												if self.deleteFolder:
+													self.logInfo("removing folder %s" % (folder))
+													shutil.rmtree(folder)
+
+
+												break
+
+										# break outer loop
+										if foundMapping:
 											break
 
-									# break outer loop
-									if foundMapping:
-										break
 
-
-							except Exception, e:
-								self.logError("failed to move file into series folder: %s" % (e) )
-								self.logError("Traceback %s" % traceback.format_exc(e))
-							else:
-								pass
-							finally:
-								pass
+								except Exception, e:
+									self.logError("failed to move file into series folder: %s" % (e) )
+									self.logError("Traceback %s" % traceback.format_exc(e))
+								else:
+									pass
+								finally:
+									pass
 
 
 
-						break
+							break
 
-			if found:
-				break
+				if found:
+					break
 
 
 	"""
