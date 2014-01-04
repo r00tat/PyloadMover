@@ -166,6 +166,13 @@ class PyloadMover(Hook):
 												# overide season mapping
 												seasonNum=mapping.get("season")
 
+											if len(seasonNum) == 1:
+												seasonNum = "0%s"%(seasonNum)
+
+
+											if len(episodeNum) == 1:
+												episodeNum = "0%s"%(episodeNum)
+
 
 											self.logInfo("Season: %s Episode: %s" %(seasonNum,episodeNum))
 
