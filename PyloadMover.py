@@ -57,13 +57,6 @@ class PyloadMover(Hook):
 		self.logDebug( "Initialized.")
 
 	"""
-	hook for finished downloads
-	"""
-	def downloadFinished(self, pyfile):
-		self.logInfo( "download complete: %s" % (pyfile))
-
-
-	"""
 	hook for finished unrar
 	"""
 	def unrarFinished(self,folder, fname):
