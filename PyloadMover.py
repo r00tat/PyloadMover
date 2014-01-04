@@ -31,11 +31,11 @@ class PyloadMover(Hook):
 		self.movieSize=self.getConfig("movieSize")
 		self.moviesPath=self.getConfig("moviesPath")
 		self.seriesPath=self.getConfig("seriesPath")
-		self.logInfo( "config loaded")
+		self.logDebug( "config loaded")
 
 	def initialize(self):
 		self.loadConfig()
-		self.logInfo( "Initialized.")
+		self.logDebug( "Initialized.")
 
 	def downloadFinished(self, pyfile):
 		self.logInfo( "download complete: %s".format(pyfile))
