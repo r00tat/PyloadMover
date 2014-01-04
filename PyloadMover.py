@@ -177,7 +177,7 @@ class PyloadMover(Hook):
 
 											# optional: rename files
 											if series.get("renamePattern") != None:
-												destFilename=renamePattern.replace("%s",seasonNum).replace("%e",episodeNum).replace("%f",fileEnding)
+												destFilename=series.get("renamePattern").replace("%s",seasonNum).replace("%e",episodeNum).replace("%f",fileEnding)
 											
 											finalPath=os.path.join(seasonFolder,destFilename)
 											self.logInfo("moving %s to %s"%(fullname,finalPath))
