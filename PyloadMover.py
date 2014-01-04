@@ -34,6 +34,8 @@ class PyloadMover(Hook):
 	seriesPath = None
 	seriesMappingFile = None
 
+	videoFileEndings = ["mkv","avi"]
+
 	"""
 	load all config vars
 	"""
@@ -74,7 +76,14 @@ class PyloadMover(Hook):
 			if not (dirpath == "sample" or dirpath == "Sample"):
 				# search for videos in filenames
 				for filename in filenames:
-					if filename.endswith(".mkv") or filename.endswith(".avi"):
+					lastDot = filename.rfind(".")
+
+					if lastDot == -1 or lastDot+1  == len(filename):
+						# no file ending or dot at the end
+						break
+					fileEnding = filename[lastDot+1 :]
+
+					if fileEnding in self.videoFileEndings:
 						fullname=os.path.join(dirpath,filename)
 						self.logInfo("found video %s %d" % (fullname,os.path.getsize(fullname)))
 						found = True
@@ -82,7 +91,7 @@ class PyloadMover(Hook):
 						if os.path.getsize(fullname) / (1024 * 1024) >= self.movieSize:
 							# Movie
 							self.logInfo("found movie")
-							folderName=os.path.join(self.moviesPath,filename.replace(".mkv","").replace(".avi",""))
+							folderName=os.path.join(self.moviesPath,filename.replace(".%s"%(fileEnding),""))
 							self.logInfo("moving to %s " % (folderName))
 							os.makedirs(folderName)
 
@@ -168,7 +177,7 @@ class PyloadMover(Hook):
 
 											# optional: rename files
 											if series.get("renamePattern") != None:
-												destFilename=renamePattern.replace("%s",seasonNum).replace("%e",episodeNum)
+												destFilename=renamePattern.replace("%s",seasonNum).replace("%e",episodeNum).replace("%f",fileEnding)
 											
 											finalPath=os.path.join(seasonFolder,destFilename)
 											self.logInfo("moving %s to %s"%(fullname,finalPath))
