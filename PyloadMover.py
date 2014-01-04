@@ -18,7 +18,8 @@ class PyloadMover(Hook):
 
 	event_map = {"downloadFinished" : "downloadFinished",
 		"coreReady": "initialize",
-		"unrarFinished":"unrarFinished"}
+		"unrarFinished":"unrarFinished",
+		"pluginConfigChanged":"pluginConfigChanged"}
 
 	def initialize(self):
 		print "Initialized."
@@ -28,3 +29,7 @@ class PyloadMover(Hook):
 
 	def unrarFinished(self,folder, fname):
 		print "finished unrar of %s in %s".format(fname,folder)
+
+	def pluginConfigChanged(self):
+		print "Plugin config changed!"
+	
