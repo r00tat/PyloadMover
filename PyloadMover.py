@@ -80,6 +80,7 @@ class PyloadMover(Hook):
 						found = True
 
 						if os.path.getsize(fullname) / (1024 * 1024) >= self.movieSize:
+							# Movie
 							self.logInfo("found movie")
 							folderName=os.path.join(self.moviesPath,filename.replace(".mkv","").replace(".avi",""))
 							self.logInfo("moving to %s " % (folderName))
@@ -87,11 +88,12 @@ class PyloadMover(Hook):
 
 							shutil.move(fullname,folderName)
 
-							self.logInfo("removing folder")
+							self.logInfo("removing folder %s " % (folder))
 							shutil.rmtree(folder)
 
 
 						else:
+							# Series
 							self.logInfo("found series")
 
 							try:
@@ -161,10 +163,18 @@ class PyloadMover(Hook):
 													os.makedirs(seasonFolder)
 
 											self.logInfo("Season folder: %s" % (seasonFolder))
-											
-											shutil.move(fullname,seasonFolder)
 
-											self.logInfo("removing folder")
+											destFilename = filename
+
+											# optional: rename files
+											if series.get("renamePattern") != None:
+												destFilename=renamePattern.replace("%s",seasonNum).replace("%e",episodeNum)
+											
+											finalPath=os.path.join(seasonFolder,destFilename)
+											self.logInfo("moving %s to %s"%(fullname,finalPath))
+											shutil.move(fullname,finalPath)
+
+											self.logInfo("removing folder %s" % (folder))
 											shutil.rmtree(folder)
 
 
