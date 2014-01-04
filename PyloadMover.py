@@ -1,6 +1,6 @@
 from module.plugins.Hook import Hook
 import os
-from os.path import join, getsize
+import shutil
 
 	
 class PyloadMover(Hook):
@@ -58,6 +58,24 @@ class PyloadMover(Hook):
 						fullname=os.path.join(dirpath,filename)
 						self.logInfo("found video %s %d" % (fullname,os.path.getsize(fullname)))
 						found = True
+
+						if os.path.getsize(fullname) / (1024 * 1024) >= self.movieSize:
+							self.logInfo("found movie")
+							folderName=os.path.join(self.moviesPath,filename.replace(".mkv","").replace(".avi",""))
+							self.logInfo("moving to %s " % (folderName))
+							os.makedirs(folderName)
+
+							shutil.move(fullname,folderName)
+
+							self.logInfo("removing folder")
+							shutil.rmtree(folder)
+
+
+						else:
+							self.logInfo("found series")
+
+							
+
 
 						break
 
