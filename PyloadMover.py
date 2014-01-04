@@ -24,8 +24,7 @@ class PyloadMover(Hook):
 	__author_mail__ = ("pyload@frig.at")
 
 
-	event_map = {"downloadFinished" : "downloadFinished",
-		"coreReady": "initialize",
+	event_map = {"coreReady": "initialize",
 		"unrarFinished":"unrarFinished",
 		"pluginConfigChanged":"pluginConfigChanged"}
 
