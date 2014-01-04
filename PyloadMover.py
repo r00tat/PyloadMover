@@ -32,6 +32,9 @@ class PyloadMover(Hook):
 	seriesPath = None
 	seriesMappingFile = None
 
+	"""
+	load all config vars
+	"""
 	def loadConfig(self):
 		self.activated=self.getConfig("activated")
 		self.movieSize=self.getConfig("movieSize")
@@ -40,13 +43,23 @@ class PyloadMover(Hook):
 		self.seriesMappingFile=self.getConfig("seriesMappingFile")
 		self.initSeriesMapping()
 
+	"""
+	initialize plugin
+	"""
 	def initialize(self):
 		self.loadConfig()
 		self.logDebug( "Initialized.")
 
+	"""
+	hook for finished downloads
+	"""
 	def downloadFinished(self, pyfile):
 		self.logInfo( "download complete: %s" % (pyfile))
 
+
+	"""
+	hook for finished unrar
+	"""
 	def unrarFinished(self,folder, fname):
 		self.logInfo( "finished unrar of %s in %s" % (fname,folder))
 
@@ -131,7 +144,9 @@ class PyloadMover(Hook):
 			
 
 		
-
+	"""
+	hook for plugin Config changed
+	"""
 	def pluginConfigChanged(self,moduleName,param,value):
 		self.logInfo( "Plugin config changed: %s=%s" % (param,value))
 		if param == "activated":
