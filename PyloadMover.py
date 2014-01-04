@@ -14,7 +14,7 @@ class PyloadMover(Hook):
 	__version__ = "0.1"
 	__description__ = "Moves finished downloads to movies or series folders."
 	__config__ = [ ("activated" , "bool" , "Activated"  , "False" ),
-		("movieSize" , "int" , "Treat files larger than this MB as movie"  , "2000" ),
+		("movieSize" , "int" , "Treat files larger than this MB as movie"  , "-1" ),
 		("moviesPath" , "str" , "Folder for movies"  , "/share/Multimedia/Movies" ),
 		("seriesPath" , "str" , "Folder for series"  , "/share/Multimedia/Series" ), 
 		("seriesMappingFile" , "str" , "XML File for mapping file names to series"  , "mover.xml" ),
@@ -86,36 +86,31 @@ class PyloadMover(Hook):
 							self.logInfo("found video %s %d" % (fullname,os.path.getsize(fullname)))
 							found = True
 
-							if os.path.getsize(fullname) / (1024 * 1024) >= self.movieSize:
-								# Movie
-								self.logInfo("found movie")
+							try:
 
-								try:
-									self.handleMovie(folder, dirpath, filename)
+								if self.movieSize > 0:
+									if os.path.getsize(fullname) / (1024 * 1024) >= self.movieSize:
+										# Movie
+										self.logInfo("found movie")
+										self.handleMovie(folder, dirpath, filename)
+									else:
+										# Series
+										self.logInfo("found series")
+										self.handleSeries(folder, dirpath, filename)
 
-								except Exception, e:
-									self.logError("failed to move file into movie folder: %s" % (e) )
-									self.logError("Traceback %s" % traceback.format_exc(e))
 								else:
-									pass
-								finally:
-									pass
+									# try as series first, otherwise treat as movie
+									if not self.handleSeries( folder, dirpath, filename):
+										self.logInfo("no series, try as movie")
+										self.handleMovie( folder, dirpath, filename)
 
+							except Exception, e:
+								self.logError("failed to move or series file %s into folder: %s" % (fullname,e) )
+								self.logError("Traceback %s" % traceback.format_exc(e))
 							else:
-								# Series
-								self.logInfo("found series")
-
-								try:
-									self.handleSeries(folder, dirpath, filename)
-
-								except Exception, e:
-									self.logError("failed to move file into series folder: %s" % (e) )
-									self.logError("Traceback %s" % traceback.format_exc(e))
-								else:
-									pass
-								finally:
-									pass
-
+								pass
+							finally:
+								pass
 
 
 							break
