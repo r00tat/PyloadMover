@@ -21,7 +21,20 @@ class PyloadMover(Hook):
 		"unrarFinished":"unrarFinished",
 		"pluginConfigChanged":"pluginConfigChanged"}
 
+	activated = False
+	movieSize = 2000
+	moviesPath = None
+	seriesPath = None
+
+	def loadConfig(self):
+		self.activated=self.getConfig("activated")
+		self.movieSize=self.getConfig("movieSize")
+		self.moviesPath=self.getConfig("moviesPath")
+		self.seriesPath=self.getConfig("seriesPath")
+		print "config loaded"
+
 	def initialize(self):
+		self.loadConfig()
 		print "Initialized."
 
 	def downloadFinished(self, pyfile):
@@ -32,4 +45,4 @@ class PyloadMover(Hook):
 
 	def pluginConfigChanged(self):
 		print "Plugin config changed!"
-	
+		self.loadConfig()
