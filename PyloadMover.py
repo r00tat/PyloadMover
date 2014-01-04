@@ -10,10 +10,10 @@ class PyloadMover(Hook):
 	__name__ = "PyloadMover"
 	__version__ = "0.1"
 	__description__ = "Moves finished downloads to movies or series folders."
-	__config__ = [ ("activated" , "bool" , "Activated"  , "True" ),
+	__config__ = [ ("activated" , "bool" , "Activated"  , "False" ),
 		("movieSize" , "int" , "Treat files larger than this MB as movie"  , "2000" ),
-		("moviesPath" , "str" , "Folder for movies"  , "/share/Multimedia/Filme" ),
-		("seriesPath" , "str" , "Folder for series"  , "/share/Multimedia/Serien" ), ]
+		("moviesPath" , "str" , "Folder for movies"  , "/share/Multimedia/Movies" ),
+		("seriesPath" , "str" , "Folder for series"  , "/share/Multimedia/Series" ), ]
 	#__threaded__ = ["downloadFinished"]
 	__author_name__ = ("Paul Woelfel")
 	__author_mail__ = ("pyload@frig.at")
@@ -74,7 +74,7 @@ class PyloadMover(Hook):
 						else:
 							self.logInfo("found series")
 
-							
+
 
 
 						break
