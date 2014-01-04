@@ -43,6 +43,6 @@ class PyloadMover(Hook):
 	def unrarFinished(self,folder, fname):
 		self.logInfo( "finished unrar of %s in %s".format(fname,folder))
 
-	def pluginConfigChanged(self):
+	def pluginConfigChanged(self,moduleName,param,value):
 		self.logInfo( "Plugin config changed!")
 		self.loadConfig()
