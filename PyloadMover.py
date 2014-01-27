@@ -20,7 +20,7 @@ class PyloadMover(Hook):
 		("seriesMappingFile" , "str" , "XML File for mapping file names to series"  , "mover.xml" ),
 		("deleteFolder" , "bool" , "Delete dowload folder after renaming"  , "True" ), ]
 	#__threaded__ = ["downloadFinished"]
-	__author_name__ = ("Paul Woelfel")
+	__author_name__ = ("r00tat")
 	__author_mail__ = ("pyload@frig.at")
 
 
