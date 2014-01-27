@@ -35,7 +35,7 @@ class PyloadMover(Hook):
 	seriesMappingFile = None
 	deleteFolder = True
 
-	videoFileEndings = ["mkv","avi"]
+	videoFileEndings = ["mkv","avi","mp4","mov","mpg","mpeg"]
 
 	"""
 	load all config vars
