@@ -225,6 +225,7 @@ class PyloadMover(Hook):
 			if foundMapping:
 				break
 
+		self.logInfo("did not find a mapping for series")
 		return False
 
 
