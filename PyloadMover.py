@@ -125,108 +125,123 @@ class PyloadMover(Hook):
 		tree = ET.parse(self.seriesMappingFile)
 		root = tree.getroot()
 
-		foundMapping = False
 		# go through all series nodes
 		for series in root.getiterator("series"):
+
+			
+
+			if series.find("mapping") == None:
+				if series.get("name").text.lower() in filenameLower:
+					self.logInfo("name found %s in %s" % (series.get("name"),filename))
+					return self.renameEpisode(folder, dirpath, filename, series)
 
 			# check mapping
 			for mapping in series.getiterator("mapping"):
 				if mapping.text.lower() in filenameLower:
 					self.logInfo("mapping found %s for %s" % (mapping.text,series.get("name")))
-					foundMapping = True
+
 					# move element to series
-
-					seriesFolderName = series.get("folder")
-					if seriesFolderName == None:
-						seriesFolderName = series.get("name")
-						if seriesFolderName == None: 
-							#again?
-							self.logWarn("did not find a folder or name in series element")
-							break
-						seriesFolderName=seriesFolderName.replace(' ',".")
-
-
-					seriesFolder=os.path.join(self.seriesPath,seriesFolderName)
-
-					seasonNum = None
-					episodeNum = None
-
-					if re.match('.*S\.?(\d+)\.?E\.?(\d+).*', filename,flags=re.IGNORECASE):
-						m = re.search('.*S\.?(\d+)\.?E\.?(\d+).*', filename,flags=re.IGNORECASE)
-						# found best match
-						seasonNum = m.group(1)
-						episodeNum = m.group(2)
-					elif re.match('.*(\d+)(\d\d).*', filename):
-						# not so a good match
-						m = re.search('.*(\d+)(\d\d).*', filename)
-						
-						seasonNum = m.group(1)
-						episodeNum = m.group(2)
-					elif re.match('.*(\d\d).*', filename):
-						# last guess
-						m = re.search('.*(\d\d).*', filename)
-						seasonNum = "01"
-						episodeNum = m.group(1)
-					elif re.match('.*(\d+).*', filename):
-						# find any number in filename
-						m = re.search('.*(\d+).*', filename)
-						seasonNum = "01"
-						episodeNum = m.group(1)
-					else:
-						# no episodeNum found
-						seasonNum = "01"
-						episodeNum = "01"
-
-
-					if mapping.get("season"):
-						# overide season mapping
-						seasonNum=mapping.get("season")
-
-					if len(seasonNum) == 1:
-						seasonNum = "0%s"%(seasonNum)
-
-
-					if len(episodeNum) == 1:
-						episodeNum = "0%s"%(episodeNum)
-
-
-					self.logInfo("Season: %s Episode: %s" %(seasonNum,episodeNum))
-
-					seasonFolder = os.path.join(seriesFolder,"S.%s" % (seasonNum))
-
-					if not os.path.isdir(seasonFolder):
-						if os.path.isdir(os.path.join(seriesFolder,"S%s" % (seasonNum))):
-							seasonFolder = os.path.join(seriesFolder,"S%s" % (seasonNum))
-						else:
-							# create folder
-							os.makedirs(seasonFolder)
-
-					self.logInfo("Season folder: %s" % (seasonFolder))
-
-					destFilename = filename
-
-					# optional: rename files
-					if series.get("renamePattern") != None:
-						destFilename=series.get("renamePattern").replace("%s",seasonNum).replace("%e",episodeNum).replace("%f",fileEnding)
-					
-					finalPath=os.path.join(seasonFolder,destFilename)
-					self.logInfo("moving %s to %s"%(fullname,finalPath))
-					shutil.move(fullname,finalPath)
-
-					if self.deleteFolder:
-						self.logInfo("removing folder %s" % (folder))
-						shutil.rmtree(folder)
-
-					return True
+					return self.renameEpisode(folder, dirpath, filename, series, mapping)
 
 					break
 
-			# break outer loop
-			if foundMapping:
-				break
 
 		self.logInfo("did not find a mapping for series")
 		return False
+
+
+	"""
+	a mapping has been found, so move the episode in the correct folder
+	"""
+	def renameEpisode(self,folder,dirpath,filename,series,mapping=None):
+
+		filenameLower=filename.lower()
+		fullname=os.path.join(dirpath,filename)
+		fileEnding=self.getFileEnding(filename)
+
+		seriesFolderName = series.get("folder")
+		if seriesFolderName == None:
+			seriesFolderName = series.get("name")
+			if seriesFolderName == None: 
+				#again?
+				self.logWarn("did not find a folder or name in series element")
+				break
+			seriesFolderName=seriesFolderName.replace(' ',".")
+
+		seriesFolder=os.path.join(self.seriesPath,seriesFolderName)
+
+		seasonNum = None
+		episodeNum = None
+
+		if re.match('.*S\.?(\d+)\.?E\.?(\d+).*', filename,flags=re.IGNORECASE):
+			m = re.search('.*S\.?(\d+)\.?E\.?(\d+).*', filename,flags=re.IGNORECASE)
+			# found best match
+			seasonNum = m.group(1)
+			episodeNum = m.group(2)
+		elif re.match('.*(\d+)(\d\d).*', filename):
+			# not so a good match
+			m = re.search('.*(\d+)(\d\d).*', filename)
+			
+			seasonNum = m.group(1)
+			episodeNum = m.group(2)
+		elif re.match('.*(\d\d).*', filename):
+			# last guess
+			m = re.search('.*(\d\d).*', filename)
+			seasonNum = "01"
+			episodeNum = m.group(1)
+		elif re.match('.*(\d+).*', filename):
+			# find any number in filename
+			m = re.search('.*(\d+).*', filename)
+			seasonNum = "01"
+			episodeNum = m.group(1)
+		else:
+			# no episodeNum found
+			seasonNum = "01"
+			episodeNum = "01"
+
+
+		if mapping != None and mapping.get("season"):
+			# overide season mapping
+			seasonNum=mapping.get("season")
+
+		if len(seasonNum) == 1:
+			seasonNum = "0%s"%(seasonNum)
+
+
+		if len(episodeNum) == 1:
+			episodeNum = "0%s"%(episodeNum)
+
+
+		self.logInfo("Season: %s Episode: %s" %(seasonNum,episodeNum))
+
+		seasonFolder = os.path.join(seriesFolder,"S.%s" % (seasonNum))
+
+		if not os.path.isdir(seasonFolder):
+			if os.path.isdir(os.path.join(seriesFolder,"S%s" % (seasonNum))):
+				seasonFolder = os.path.join(seriesFolder,"S%s" % (seasonNum))
+			else:
+				# create folder
+				os.makedirs(seasonFolder)
+
+		self.logInfo("Season folder: %s" % (seasonFolder))
+
+		destFilename = filename
+
+		# optional: rename files
+		if series.get("renamePattern") != None:
+			destFilename=series.get("renamePattern").replace("%s",seasonNum).replace("%e",episodeNum).replace("%f",fileEnding)
+		
+		finalPath=os.path.join(seasonFolder,destFilename)
+		self.logInfo("moving %s to %s"%(fullname,finalPath))
+		shutil.move(fullname,finalPath)
+
+		if self.deleteFolder:
+			self.logInfo("removing folder %s" % (folder))
+			shutil.rmtree(folder)
+
+		return True
+
+
 
 
 	def handleMovie(self,folder,dirpath,filename):
