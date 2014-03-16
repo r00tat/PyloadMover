@@ -144,4 +144,7 @@ Default: `True`
 
 Things to come
 -------------
-It would be nice, if IMDB and so would be search for infos to the movie or episode and automatically write this info to .nfo files for XBMC.
+~~It would be nice, if IMDB and so would be search for infos to the movie or episode and automatically write this info to .nfo files for XBMC. ~~
+
+I found a good solution to present your series and movies nicely with RaspBMC. I use Pyload with this plugin to sort the series and movies into the correct folders. If you [configure RaspBMC to index these folders](http://wiki.xbmc.org/index.php?title=Adding_video_sources), it will download the correct info from TVDB and IMDB. The [task to update the library could also be automated](http://wiki.xbmc.org/index.php?title=Add-on:XBMC_Library_Auto_Update). 
+
