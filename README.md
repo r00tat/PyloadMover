@@ -23,7 +23,7 @@ restart pyload
 
 Now configure the settings as needed. 
 
-![](http://https://raw.github.com/r00tat/PyloadMover/master/Config-Screenshot.png)
+![](https://raw.github.com/r00tat/PyloadMover/master/Config-Screenshot.png)
 
 
 Movies
