@@ -5,6 +5,27 @@ Pyload Hook plugin, which moves downloaded files to movie or series folders.
 
 Pyload tries to find a mapping series for the file first. If this is unsuccessful it will be handled as a movie.
 
+
+Installation
+-------------
+
+Change to pyload folder:
+
+	$ cd .pyload
+
+download plugin:
+
+	$ wget https://raw.github.com/r00tat/PyloadMover/master/PyloadMover.py -O module/plugins/hooks/PyloadMover.py
+
+restart pyload
+
+	$ ./pyload.sh restart
+
+Now configure the settings as needed. 
+
+![](http://https://raw.github.com/r00tat/PyloadMover/master/Config-Screenshot.png)
+
+
 Movies
 -------------
 For movies the plugin searches in the folder for .mkv or .avi files. It creates a folder named like the movie file and puts the file right there. 
