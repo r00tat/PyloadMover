@@ -48,6 +48,7 @@ class PyloadMover(Hook):
 		self.seriesMappingFile=self.getConfig("seriesMappingFile")
 		self.deleteFolder=self.getConfig("deleteFolder")
 		self.initSeriesMapping()
+		self.logInfo("PyloadMover loaded.")
 
 	"""
 	initialize plugin
@@ -131,7 +132,7 @@ class PyloadMover(Hook):
 			
 
 			if series.find("mapping") == None:
-				if series.get("name").text.lower() in filenameLower:
+				if series.get("name").lower() in filenameLower:
 					self.logInfo("name found %s in %s" % (series.get("name"),filename))
 					return self.renameEpisode(folder, dirpath, filename, series)
 
@@ -165,7 +166,7 @@ class PyloadMover(Hook):
 			if seriesFolderName == None: 
 				#again?
 				self.logWarn("did not find a folder or name in series element")
-				break
+				return False
 			seriesFolderName=seriesFolderName.replace(' ',".")
 
 		seriesFolder=os.path.join(self.seriesPath,seriesFolderName)
