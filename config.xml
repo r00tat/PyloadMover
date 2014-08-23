@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+		<moviesPath>/share/Multimedia/Filme</moviesPath>
+		<seriesPath>/share/Multimedia/Serien</seriesPath>
+		<seriesMappingFile>/share/Multimedia/sys/PyloadMover.xml</seriesMappingFile>
+		<deleteFolder>true</deleteFolder>
+		<movieSize>0</movieSize>
+</config>
