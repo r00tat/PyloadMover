@@ -51,7 +51,7 @@ class TorrentMover(Mover):
 				else :
 					self.deleteFolder = False
 
-		self.logInfo("TorrentMover loaded.")
+		self.info("TorrentMover loaded.")
 
 
 
@@ -72,12 +72,18 @@ class TorrentMover(Mover):
 if __name__ == "__main__":
 	logging.basicConfig(filename='/tmp/torrentmover.log',level=logging.DEBUG)
 
-	if len(sys.argv) >= 1: 
-		confFile=sys.argv[0]
+	if len(sys.argv) >= 2: 
+		confFile=sys.argv[1]
 	else:
 		confFile  = "/etc/torrentmover.xml"
 
-	fname=os.getenv('TR_TORRENT_NAME','')
-	folder = "%s/%s" % (os.getenv('TR_TORRENT_DIR',''),fname)
-	torrentMover = TorrentMover(confFile)
-	torrentMover.unrarFinished(folder, fname)
+	fname=os.getenv('TR_TORRENT_NAME')
+	fold=os.getenv('TR_TORRENT_DIR')
+	if fname != None and fold != None:
+		folder = "%s/%s" % (fold,fname)
+		torrentMover = TorrentMover(confFile)
+		torrentMover.unrarFinished(folder, fname)
+		sys.exit(0)
+	else:
+		print "TR_TORRENT_NAME or TR_TORRENT_DIR not set!"
+ 		sys.exit(1)
