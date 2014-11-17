@@ -1,5 +1,6 @@
 from module.plugins.Hook import Hook
-from Mover import Mover
+from .Mover import Mover
+import traceback
 
 
 class PyloadMover(Hook, Mover):
@@ -7,7 +8,7 @@ class PyloadMover(Hook, Mover):
     Moves files to movie or series folder.
     """
     __name__ = "PyloadMover"
-    __version__ = "0.2"
+    __version__ = "0.21"
     __description__ = "Moves finished downloads to movies or series folders."
     __config__ = [("activated", "bool", "Activated", "False"),
                   ("movieSize", "int", "Treat files larger than this MB as movie", "-1"),
@@ -21,7 +22,32 @@ class PyloadMover(Hook, Mover):
 
     event_map = {"coreReady": "initialize",
                  "unrarFinished": "unrarFinished",
-                 "pluginConfigChanged": "pluginConfigChanged"}
+                 "pluginConfigChanged": "pluginConfigChanged",
+                 "archive_extracted": "archive_extracted"}
+
+    """
+    initialize plugin
+    """
+    def initialize(self):
+        self.loadConfig()
+        self.initSeriesMapping()
+        self.log_debug("Initialized.")
+
+    """
+        extracted Hook
+    """
+    def archive_extracted(self, pyfile, folder, filename, files, *args, **kwargs):
+        try:
+            self.log_info("test?")
+            self.log_info("folder: %s" % folder)
+            self.log_info("filename %s" % filename)
+            # self.log_info("files: %s" % files)
+            self.log_info("filename %s" % filename)
+
+            self.unrarFinished(folder, filename)
+        except Exception, e:
+            print "Error %s", e
+            print traceback.format_exc()
 
     """
     load all config vars
@@ -34,14 +60,14 @@ class PyloadMover(Hook, Mover):
         self.seriesMappingFile = self.getConfig("seriesMappingFile")
         self.deleteFolder = self.getConfig("deleteFolder")
         self.initSeriesMapping()
-        self.logInfo("PyloadMover loaded.")
+        self.log_info("PyloadMover loaded.")
 
     """
     hook for plugin Config changed
     """
     def pluginConfigChanged(self, moduleName, param, value):
         if moduleName == "PyloadMover":
-            self.logInfo("Plugin config changed: %s=%s" % (param, value))
+            self.log_info("Plugin config changed: %s=%s" % (param, value))
             if param == "activated":
                 self.activated = value
             elif param == "movieSize":
@@ -57,15 +83,14 @@ class PyloadMover(Hook, Mover):
                 self.deleteFolder = value
 
         #self.loadConfig()
-
-    def debug(self, message):
+    def log_debug(self, message):
         self.logDebug(message)
 
-    def info(self, message):
+    def log_info(self, message):
         self.logInfo(message)
 
-    def warn(self, message):
+    def log_warn(self, message):
         self.logWarn(message)
 
-    def err(self, message):
+    def log_err(self, message):
         self.logError(message)

@@ -37,13 +37,13 @@ class Mover():
     def initialize(self):
         self.loadConfig()
         self.initSeriesMapping()
-        self.debug("Initialized.")
+        self.log_debug("Initialized.")
 
     """
     hook for finished unrar
     """
     def unrarFinished(self, folder, fname):
-        self.info("finished unrar of %s in %s" % (fname, folder))
+        self.log_info("finished unrar of %s in %s" % (fname, folder))
 
         if self.activated:
             # we have to search folder for sub folders or files
@@ -59,7 +59,7 @@ class Mover():
 
                         if fileEnding in self.videoFileEndings:
                             fullname = os.path.join(dirpath, filename)
-                            self.info("found video %s %d" % (fullname, os.path.getsize(fullname)))
+                            self.log_info("found video %s %d" % (fullname, os.path.getsize(fullname)))
                             found = True
 
                             try:
@@ -67,22 +67,22 @@ class Mover():
                                 if self.movieSize > 0:
                                     if os.path.getsize(fullname) / (1024 * 1024) >= self.movieSize:
                                         # Movie
-                                        self.info("found movie")
+                                        self.log_info("found movie")
                                         self.handleMovie(folder, dirpath, filename)
                                     else:
                                         # Series
-                                        self.info("found series")
+                                        self.log_info("found series")
                                         self.handleSeries(folder, dirpath, filename)
 
                                 else:
                                     # try as series first, otherwise treat as movie
                                     if not self.handleSeries(folder, dirpath, filename):
-                                        self.info("no series, try as movie")
+                                        self.log_info("no series, try as movie")
                                         self.handleMovie(folder, dirpath, filename)
 
                             except Exception, e:
-                                self.err("failed to move or series file %s into folder: %s" % (fullname, e))
-                                self.err("Traceback %s" % traceback.format_exc(e))
+                                self.log_err("failed to move or series file %s into folder: %s" % (fullname, e))
+                                self.log_err("Traceback %s" % traceback.format_exc(e))
                             else:
                                 pass
                             finally:
@@ -111,20 +111,20 @@ class Mover():
 
             if series.find("mapping") is None:
                 if series.get("name").lower() in filenameLower:
-                    self.info("name found %s in %s" % (series.get("name"), filename))
+                    self.log_info("name found %s in %s" % (series.get("name"), filename))
                     return self.renameEpisode(folder, dirpath, filename, series)
 
             # check mapping
             for mapping in series.getiterator("mapping"):
                 if mapping.text.lower() in filenameLower:
-                    self.info("mapping found %s for %s" % (mapping.text, series.get("name")))
+                    self.log_info("mapping found %s for %s" % (mapping.text, series.get("name")))
 
                     # move element to series
                     return self.renameEpisode(folder, dirpath, filename, series, mapping)
 
                     break
 
-        self.info("did not find a mapping for series")
+        self.log_info("did not find a mapping for series")
         return False
 
     """
@@ -141,7 +141,7 @@ class Mover():
             seriesFolderName = series.get("name")
             if seriesFolderName is None:
                 #again?
-                self.warn("did not find a folder or name in series element")
+                self.log_warn("did not find a folder or name in series element")
                 return False
             seriesFolderName = seriesFolderName.replace(' ', ".")
 
@@ -186,7 +186,7 @@ class Mover():
         if len(episodeNum) == 1:
             episodeNum = "0%s" % (episodeNum)
 
-        self.info("Season: %s Episode: %s" % (seasonNum, episodeNum))
+        self.log_info("Season: %s Episode: %s" % (seasonNum, episodeNum))
 
         seasonFolder = os.path.join(seriesFolder, "S.%s" % (seasonNum))
 
@@ -197,7 +197,7 @@ class Mover():
                 # create folder
                 os.makedirs(seasonFolder)
 
-        self.info("Season folder: %s" % (seasonFolder))
+        self.log_info("Season folder: %s" % (seasonFolder))
 
         destFilename = filename
 
@@ -206,11 +206,11 @@ class Mover():
             destFilename = series.get("renamePattern").replace("%s", seasonNum).replace("%e", episodeNum).replace("%f", fileEnding)
 
         finalPath = os.path.join(seasonFolder, destFilename)
-        self.info("moving %s to %s" % (fullname, finalPath))
+        self.log_info("moving %s to %s" % (fullname, finalPath))
         shutil.move(fullname, finalPath)
 
         if self.deleteFolder:
-            self.info("removing folder %s" % (folder))
+            self.log_info("removing folder %s" % (folder))
             shutil.rmtree(folder)
 
         return True
@@ -223,7 +223,7 @@ class Mover():
         # create foldername out of filename (without file ending)
         folderName = os.path.join(self.moviesPath, filename.replace(".%s" % (fileEnding), ""))
 
-        self.info("moving to %s " % (folderName))
+        self.log_info("moving to %s " % (folderName))
         # create dirs
         os.makedirs(folderName)
 
@@ -231,7 +231,7 @@ class Mover():
 
         # delete downloaded folder if necesary
         if self.deleteFolder:
-            self.info("removing folder %s " % (folder))
+            self.log_info("removing folder %s " % (folder))
             shutil.rmtree(folder)
 
         return True
@@ -284,21 +284,20 @@ class Mover():
                 pass
             except Exception, e:
                 # file is wrong
-                self.err("could not load mapping file %s: %s" % (self.seriesMappingFile, e))
+                self.log_err("could not load mapping file %s: %s" % (self.seriesMappingFile, e))
             else:
                 pass
             finally:
                 pass
 
-    def debug(self, message):
+    def log_debug(self, message):
         pass
 
-    def info(self, message):
+    def log_info(self, message):
         pass
 
-    def warn(self, message):
+    def log_warn(self, message):
         pass
 
-    def err(self, message):
+    def log_err(self, message):
         pass
-
