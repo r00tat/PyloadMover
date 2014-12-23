@@ -48,7 +48,6 @@ class Mover():
         if self.activated:
             # we have to search folder for sub folders or files
 
-            found = False
             # loop through directories in folder
             for (dirpath, dirnames, filenames) in os.walk(folder):
                 # ignore samples
@@ -60,7 +59,6 @@ class Mover():
                         if fileEnding in self.videoFileEndings:
                             fullname = os.path.join(dirpath, filename)
                             self.log_info("found video %s %d" % (fullname, os.path.getsize(fullname)))
-                            found = True
 
                             try:
 
@@ -83,15 +81,6 @@ class Mover():
                             except Exception, e:
                                 self.log_err("failed to move or series file %s into folder: %s" % (fullname, e))
                                 self.log_err("Traceback %s" % traceback.format_exc(e))
-                            else:
-                                pass
-                            finally:
-                                pass
-
-                            break
-
-                if found:
-                    break
 
     """
     handle a series
